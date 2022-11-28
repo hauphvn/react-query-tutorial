@@ -1,33 +1,49 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
 import './App.css'
-
+import {QueryClientProvider, QueryClient} from "react-query";
+import { Link, Route, Router, Routes, useLocation } from "react-router-dom";
+import Home from "../src/components/Home";
+import ReduxPost from "../src/components/ReduxPost";
+import ReactQueryPost from "../src/components/ReactQueryPost";
+import {ReactQueryDevtools} from "react-query/devtools";
+import { useEffect, useState } from "react";
 function App() {
-  const [count, setCount] = useState(0)
-
+const location = useLocation();
+const [isHome, setIsHome] = useState(true);
+useEffect(() => {
+  console.log(11,location.pathname)
+  console.log(22,location?.pathname === ('/home' || '/' || ''))
+  const homePath = location?.pathname;
+  if(homePath === ('/home') || homePath === ('/')){
+    setIsHome(true);
+  }else{
+    setIsHome(false);
+  }
+},[location.pathname]);
+const queryClient = new QueryClient();
   return (
-    <div className="App">
+    <QueryClientProvider client={queryClient}>
       <div>
-        <a href="https://vitejs.dev" target="_blank">
-          <img src="/vite.svg" className="logo" alt="Vite logo" />
-        </a>
-        <a href="https://reactjs.org" target="_blank">
-          <img src={reactLogo} className="logo react" alt="React logo" />
-        </a>
+        <header>
+          {!isHome && (
+            <div className={'header'}>
+              <Link to={'/'}>Go home</Link>
+              <hr/>
+            </div>
+          )}
+        </header>
+        <Routes>
+          <Route index element={<Home/>}/>
+          <Route path={'home'} element={<Home/>}/>
+          <Route path={'redux-post'} element={<ReduxPost/>}/>
+          <Route path={'react-query-post'} element={<ReactQueryPost/>}/>
+          <Route path="*" element={<p>There's nothing here: 404!</p>}/>
+        </Routes>
+        {/*<Route element={<Layout/>}>*/}
+        {/*</Route>*/}
       </div>
-      <h1>Vite + React</h1>
-      <div className="card">
-        <button onClick={() => setCount((count) => count + 1)}>
-          count is {count}
-        </button>
-        <p>
-          Edit <code>src/App.tsx</code> and save to test HMR
-        </p>
-      </div>
-      <p className="read-the-docs">
-        Click on the Vite and React logos to learn more
-      </p>
-    </div>
+      <ReactQueryDevtools initialIsOpen={false}/>
+    </QueryClientProvider>
+
   )
 }
 
